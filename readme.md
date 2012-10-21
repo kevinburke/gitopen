@@ -1,7 +1,7 @@
 # Gitopen
 
-This is a convenience script to open one of your remote URL's in your default
-browser.
+This is a convenience script to open the repo corresponding to a Git remote
+URL in your default browser.
 
 ### Usage
 
@@ -15,6 +15,13 @@ $ gitopen origin
 ```
 
 Will open `https://github.com/kevinburke/gitopen` in your browser.
+
+### Installation
+
+1. Clone this repository
+2. Place the `gitopen` executable somewhere on your PATH, possibly like this:
+
+    ln -s gitopen /usr/local/bin
 
 ### Features
 

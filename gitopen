@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import subprocess
+import sys
+import re
+
+parser = argparse.ArgumentParser(description="Get the git remote")
+parser.add_argument('remote_name', type=str, 
+                    help="Name of the remote to open")
+args = parser.parse_args()
+
+cmd = "git config --get remote.{}.url".format(args.remote_name)
+try:
+    remote_name = subprocess.check_output(cmd, shell=True)
+except subprocess.CalledProcessError:
+    sys.stderr.write("Couldn't find that remote name\n")
+    sys.exit(1)
+
+def parse_git_ssh_url(url):
+    # match user@<hostname>:<web_user>/<user_repo>
+    ssh_regex = re.compile(r'''
+                           ^((?P<git_user>\S+)@|git://) # e.g. kevin@ for git ssh url's 
+                           (?P<host>[^/:]+) # hostname
+                           [:/]             # separator
+                           (?P<user>[^/]+)
+                           /
+                           (?P<repo_name>[^\.]+)
+                           \.git$
+                           ''', re.X)
+    return ssh_regex.match(url)
+
+match = parse_git_ssh_url(remote_name)
+
+url = "".join(["https://", match.group('host'), '/', match.group('user'), '/',
+               match.group('repo_name')])
+os.system("open {}".format(url))

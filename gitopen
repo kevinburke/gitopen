@@ -20,7 +20,7 @@ except subprocess.CalledProcessError:
 
 def parse_git_ssh_url(url):
     # match user@<hostname>:<web_user>/<user_repo>
-    ssh_regex = re.compile(r'''
+    ssh_regex = re.compile(r"""
                            ^((?P<git_user>\S+)@|git://) # e.g. kevin@ for git ssh url's 
                            (?P<host>[^/:]+) # hostname
                            [:/]             # separator
@@ -28,7 +28,7 @@ def parse_git_ssh_url(url):
                            /
                            (?P<repo_name>[^\.]+)
                            \.git$
-                           ''', re.X)
+                           """, re.X)
     return ssh_regex.match(url)
 
 match = parse_git_ssh_url(remote_name)

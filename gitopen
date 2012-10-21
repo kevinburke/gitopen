@@ -19,9 +19,17 @@ except subprocess.CalledProcessError:
     sys.exit(1)
 
 def parse_git_ssh_url(url):
-    # match user@<hostname>:<web_user>/<user_repo>
+    """Parse Git remote URL's into a SRE_Match object
+    
+    Matches user@<hostname>:<web_user>/<user_repo>
+    or      git://<hostname>/<web_user>/<user_repo>
+    """
     ssh_regex = re.compile(r"""
-                           ^((?P<git_user>\S+)@|git://) # e.g. kevin@ for git ssh url's 
+                           ^(
+                                (?P<git_user>\S+)@   # match user@ ssh url's
+                                |
+                                git://               # match git read-only url's
+                           )
                            (?P<host>[^/:]+) # hostname
                            [:/]             # separator
                            (?P<user>[^/]+)

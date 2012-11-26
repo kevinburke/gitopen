@@ -16,6 +16,16 @@ $ gitopen origin
 
 Will open `https://github.com/kevinburke/gitopen` in your browser.
 
+##### Open a pull request
+
+To open a pull request from the command line, run:
+
+```
+$ gitopen origin -p
+```
+
+This will open a pull request for the current branch to be pulled into master.
+
 ### Installation
 
 1. Clone this repository

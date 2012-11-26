@@ -34,7 +34,7 @@ def parse_git_ssh_url(url):
                            [:/]             # separator
                            (?P<user>[^/]+)
                            /
-                           (?P<repo_name>[^\.]+)
+                           (?P<repo_name>.+?)
                            \.git$
                            """, re.X)
     return ssh_regex.match(url)

@@ -7,8 +7,8 @@ import sys
 import re
 
 parser = argparse.ArgumentParser(description="Get the git remote")
-parser.add_argument('remote_name', type=str, 
-                    help="Name of the remote to open")
+parser.add_argument('remote_name', type=str, help="Name of the remote to open")
+parser.add_argument('-p', '--pull', action='store_true')
 args = parser.parse_args()
 
 cmd = "git config --get remote.{}.url".format(args.remote_name)
@@ -43,4 +43,8 @@ match = parse_git_ssh_url(remote_name)
 
 url = "".join(["https://", match.group('host'), '/', match.group('user'), '/',
                match.group('repo_name')])
+if args.pull:
+    cmd = "git rev-parse --symbolic-full-name --abbrev-ref HEAD"
+    branch_name = subprocess.check_output(cmd, shell=True)
+    url = url + "/pull/new/master...{}".format(branch_name)
 os.system("open {}".format(url))

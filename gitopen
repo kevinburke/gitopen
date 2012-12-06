@@ -7,9 +7,11 @@ import sys
 import re
 
 parser = argparse.ArgumentParser(description="Get the git remote")
-parser.add_argument('remote_name', type=str, help="Name of the remote to open")
+parser.add_argument('remote_name', type=str, default='origin', nargs='?',
+                    help="Name of the remote to open")
 parser.add_argument('-p', '--pull', action='store_true')
 args = parser.parse_args()
+print args.remote_name
 
 cmd = "git config --get remote.{}.url".format(args.remote_name)
 try:

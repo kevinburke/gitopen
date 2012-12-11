@@ -14,7 +14,8 @@ origin	git@github.com:kevinburke/gitopen.git (push)
 $ ./gitopen origin
 ```
 
-Will open `https://github.com/kevinburke/gitopen` in your browser.
+Will open `https://github.com/kevinburke/gitopen` in your browser. If you do
+this hundreds of times a week, this is a pretty useful hack.
 
 ##### Open a pull request
 
@@ -24,7 +25,8 @@ To open a pull request from the command line, run:
 $ gitopen origin -p
 ```
 
-This will open a pull request for the current branch to be pulled into master.
+This will open a pull request for the current branch to be pulled from the
+`origin` remote into master on the `origin` remote.
 
 ##### Open a pull request against a different remote
 

@@ -21,7 +21,7 @@ this hundreds of times a week, this is a pretty useful hack.
 
 To open a pull request from the command line, run:
 
-```
+```bash
 $ gitopen origin -p
 ```
 
@@ -33,7 +33,7 @@ This will open a pull request for the current branch to be pulled from the
 To open a pull request against a different remote (say, the `upstream` remote),
 specify the remote name after the `-p` flag:
 
-```
+```bash
 $ gitopen -p upstream
 ```
 
@@ -45,7 +45,7 @@ upstream master.
 1. Clone this repository: `git clone git://github.com/kevinburke/gitopen.git`
 2. Place the `gitopen` executable somewhere on your PATH, possibly like this:
 
-```
+```bash
 ln -s $PWD/gitopen /usr/local/bin
 ```
 
@@ -53,3 +53,4 @@ ln -s $PWD/gitopen /usr/local/bin
 
 * Works with URL's behind the firewall (eg private installs)
 * Works with SSH and git-read-only URL's
+

@@ -11,7 +11,7 @@ From anywhere in a Git repo:
 $ git remote -v | grep push
 origin	git@github.com:kevinburke/gitopen.git (push)
 
-$ gitopen origin
+$ ./gitopen origin
 ```
 
 Will open `https://github.com/kevinburke/gitopen` in your browser.
@@ -26,12 +26,24 @@ $ gitopen origin -p
 
 This will open a pull request for the current branch to be pulled into master.
 
+##### Open a pull request against a different remote
+
+To open a pull request against a different remote (say, the `upstream` remote),
+specify the remote name after the `-p` flag:
+
+```
+$ gitopen -p upstream
+```
+
+This will open a pull request for the current branch to be pulled into the
+upstream master.
+
 ### Installation
 
 1. Clone this repository
 2. Place the `gitopen` executable somewhere on your PATH, possibly like this:
 
-    ln -s gitopen /usr/local/bin
+    ln -s $PWD/gitopen /usr/local/bin
 
 ### Features
 

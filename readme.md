@@ -42,10 +42,12 @@ upstream master.
 
 ### Installation
 
-1. Clone this repository
+1. Clone this repository: `git clone git://github.com/kevinburke/gitopen.git`
 2. Place the `gitopen` executable somewhere on your PATH, possibly like this:
 
-    ln -s $PWD/gitopen /usr/local/bin
+```
+ln -s $PWD/gitopen /usr/local/bin
+```
 
 ### Features
 

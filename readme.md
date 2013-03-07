@@ -40,6 +40,15 @@ $ gitopen -p upstream
 This will open a pull request for the current branch to be pulled into the
 upstream master.
 
+##### View all current pull requests
+
+To open the view with all current pull requests for the repo, use the `-s` or
+`--pulls` flag:
+
+```bash
+$ gitopen --pulls
+```
+
 ### Installation
 
 1. Clone this repository: `git clone git://github.com/kevinburke/gitopen.git`

@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import argparse
-import os
 import subprocess
 import sys
 import re
+import webbrowser
 
 parser = argparse.ArgumentParser(description="Get the git remote")
 parser.add_argument('remote_name', type=str, default='origin', nargs='?',
@@ -74,6 +74,5 @@ if args.pull:
         upstream_remote_branch = 'master'
     url = url + "/pull/new/{}...{}".format(upstream_remote_branch, branch_name)
 
-# XXX not sure if this works on windows, linux
-os.system("open {}".format(url))
+webbrowser.open(url)
 

@@ -9,6 +9,8 @@ import re
 parser = argparse.ArgumentParser(description="Get the git remote")
 parser.add_argument('remote_name', type=str, default='origin', nargs='?',
                     help="Name of the remote to open")
+parser.add_argument('-s', '--pulls', action='store_true', 
+                    help=('Open the pull requests list'))
 parser.add_argument('-p', '--pull', nargs='?', default=None, const='origin',
                     help=('Open a pull request for the current branch. '
                           'Defaults to a pull request against the '
@@ -52,6 +54,13 @@ match = _parse_git_remote_url(remote_url)
 
 url = "".join(["https://", match.group('host'), '/', match.group('user'), '/',
                match.group('repo_name')])
+
+if args.pulls and args.pull:
+    raise ValueError("Cannot specify both --pulls and --pull flags")
+
+if args.pulls:
+    url = url + "/pulls"
+
 if args.pull:
     cmd = "git rev-parse --symbolic-full-name --abbrev-ref HEAD"
     branch_name = subprocess.check_output(cmd, shell=True)

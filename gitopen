@@ -74,5 +74,5 @@ if args.pull:
         upstream_remote_branch = 'master'
     url = url + "/pull/new/{}...{}".format(upstream_remote_branch, branch_name)
 
-webbrowser.open(url)
+webbrowser.open(url.strip())
 

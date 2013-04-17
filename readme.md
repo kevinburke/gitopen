@@ -22,11 +22,11 @@ this hundreds of times a week, this is a pretty useful hack.
 To open a pull request from the command line, run:
 
 ```bash
-$ gitopen origin -p
+$ gitopen -p
 ```
 
 This will open a pull request for the current branch to be pulled from the
-`origin` remote into master on the `origin` remote.
+`origin` remote into master.
 
 ##### Open a pull request against a different remote
 

@@ -63,3 +63,6 @@ ln -s $PWD/gitopen /usr/local/bin
 * Works with URL's behind the firewall (eg private installs)
 * Works with SSH and git-read-only URL's
 
+## Todo
+
+- open pull requests against the upstream by default (if it exists)

@@ -42,6 +42,8 @@ def _parse_git_remote_url(url):
                                 (?P<git_user>\S+)@   # match user@ ssh url's
                                 |
                                 git://               # match git read-only url's
+                                |
+                                https://
                            )
                            (?P<host>[^/:]+) # hostname
                            [:/]             # separator

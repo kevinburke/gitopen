@@ -52,7 +52,10 @@ def _parse_git_remote_url(url):
                            (?P<repo_name>.+?)
                            \.git$
                            """, re.X)
-    return ssh_regex.match(str(url, 'utf-8'))
+    try:
+        return ssh_regex.match(str(url, 'utf-8'))
+    except Exception: # Python 2
+        return ssh_regex.match(str(url))
 
 
 def _get_branch():

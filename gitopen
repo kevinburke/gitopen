@@ -15,6 +15,8 @@ parser.add_argument('-s', '--pulls', action='store_true',
                     help=('Open the pull requests list'))
 parser.add_argument('-i', '--issues', action='store_true', 
                     help=('Open the issues page'))
+parser.add_argument('-c', '--commits', action='store_true', 
+                    help=('Open the commits list'))
 parser.add_argument('-p', '--pull', nargs='?', default=None, const='origin',
                     help=('Open a pull request for the current branch. '
                           'Defaults to a pull request against the '
@@ -80,6 +82,8 @@ elif args.branch:
     url += "/tree/{}".format(branch)
 elif args.issues:
     url = url + "/issues"
+elif args.commits:
+    url = url + "/commits"
 
 if args.pull:
 

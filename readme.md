@@ -40,6 +40,22 @@ $ gitopen -p upstream
 This will open a pull request for the current branch to be pulled into the
 upstream master.
 
+##### Open the tip of a branch
+
+Use `--tip` to open the tip:
+
+```bash
+gitopen --tip
+```
+
+It works with branches as well:
+
+```bash
+gitopen --tip --branch develop
+```
+
+Will open the most recent commit on the `develop` branch.
+
 ##### View all current pull requests
 
 To open the view with all current pull requests for the repo, use the `-s` or

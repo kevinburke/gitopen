@@ -6,15 +6,19 @@ import subprocess
 import sys
 import re
 
+sentinel = object()
+
 parser = argparse.ArgumentParser(description="Get the git remote")
 parser.add_argument('remote_name', type=str, default='origin', nargs='?',
                     help="Name of the remote to open")
-parser.add_argument('-b', '--branch', action='store_true', 
+parser.add_argument('-b', '--branch', nargs='?', const=sentinel,
                     help=('open the current branch in the browser'))
 parser.add_argument('-s', '--pulls', action='store_true', 
                     help=('Open the pull requests list'))
 parser.add_argument('-i', '--issues', action='store_true', 
                     help=('Open the issues page'))
+parser.add_argument('-t', '--tip', action='store_true', 
+                    help=('Open the latest commit (works with --branch as well)'))
 parser.add_argument('-c', '--commits', action='store_true', 
                     help=('Open the commits list'))
 parser.add_argument('-p', '--pull', nargs='?', default=None, const='origin',
@@ -71,30 +75,43 @@ match = _parse_git_remote_url(remote_url)
 
 url = "".join(["https://", match.group('host'), '/', match.group('user'), '/',
                match.group('repo_name')])
-branch = _get_branch()
+
+if args.branch and args.branch is sentinel:
+    branch = _get_branch()
+else:
+    branch = args.branch
+
+def _open_url(url):
+    # Would like to use webbrowser but sometimes it just fails.
+    print "opening {}".format(url)
+    os.system("open {}".format(url.strip()))
+    sys.exit(0)
 
 if args.pulls and args.pull:
     raise ValueError("Cannot specify both --pulls and --pull flags")
 
+print url
 if args.pulls:
-    url = url + "/pulls"
-elif args.branch:
-    url += "/tree/{}".format(branch)
+    _open_url(url + "/pulls")
+elif args.branch and not args.tip:
+    _open_url(url + "/tree/{}".format(branch))
 elif args.issues:
-    url = url + "/issues"
+    _open_url(url + "/issues")
 elif args.commits:
-    url = url + "/commits"
+    _open_url(url + "/commits")
+elif args.tip:
+    commit = subprocess.check_output(
+        "git rev-parse {}".format(branch or "HEAD"), shell=True)
+    _open_url(url + "/commit/{}".format(commit))
 
 if args.pull:
-
     if args.pull != 'origin':
         upstream_url = _get_remote_url(args.pull)
         upstream_match = _parse_git_remote_url(upstream_url)
         upstream_remote_branch = '{}:master'.format(upstream_match.group('user'))
     else:
         upstream_remote_branch = 'master'
-    url = url + "/pull/new/{}...{}".format(upstream_remote_branch, branch)
+    _open_url(url + "/pull/new/{}...{}".format(upstream_remote_branch, branch))
 
-# Would like to use webbrowser but sometimes it just fails.
-os.system("open {}".format(url.strip()))
+_open_url(url)
 

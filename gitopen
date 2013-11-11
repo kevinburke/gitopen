@@ -83,14 +83,12 @@ else:
 
 def _open_url(url):
     # Would like to use webbrowser but sometimes it just fails.
-    print "opening {}".format(url)
     os.system("open {}".format(url.strip()))
     sys.exit(0)
 
 if args.pulls and args.pull:
     raise ValueError("Cannot specify both --pulls and --pull flags")
 
-print url
 if args.pulls:
     _open_url(url + "/pulls")
 elif args.branch and not args.tip:

@@ -105,6 +105,7 @@ elif args.tip:
     _open_url(url + "/commit/{}".format(commit))
 
 if args.pull:
+    branch = _get_branch()
     if args.pull != 'origin':
         upstream_url = _get_remote_url(args.pull)
         upstream_match = _parse_git_remote_url(upstream_url)

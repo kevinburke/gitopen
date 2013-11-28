@@ -58,7 +58,7 @@ def _parse_git_remote_url(url):
                            (?P<user>[^/]+)
                            /
                            (?P<repo_name>.+?)
-                           \.git$
+                           (\.git)?$
                            """, re.X)
     try:
         return ssh_regex.match(str(url, 'utf-8'))
@@ -73,6 +73,8 @@ def _get_branch():
 remote_url = _get_remote_url(args.remote_name)
 match = _parse_git_remote_url(remote_url)
 
+if match is None:
+    raise ValueError("Couldn't parse {url} as a git remote".format(url=remote_url))
 url = "".join(["https://", match.group('host'), '/', match.group('user'), '/',
                match.group('repo_name')])
 

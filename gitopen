@@ -68,7 +68,7 @@ def _parse_git_remote_url(url):
 
 def _get_branch():
     cmd = "git rev-parse --symbolic-full-name --abbrev-ref HEAD"
-    return subprocess.check_output(cmd, shell=True)
+    return subprocess.check_output(cmd, shell=True).decode('utf-8')
 
 remote_url = _get_remote_url(args.remote_name)
 match = _parse_git_remote_url(remote_url)
@@ -85,7 +85,7 @@ else:
 
 def _open_url(url):
     # Would like to use webbrowser but sometimes it just fails.
-    os.system("open {}".format(url.strip()))
+    os.system("open {url}".format(url=url.strip()))
     sys.exit(0)
 
 if args.pulls and args.pull:
@@ -107,8 +107,8 @@ elif args.tip:
 if args.pull:
     branch = _get_branch()
     if args.pull != 'origin':
-        upstream_url = _get_remote_url(args.pull)
-        upstream_match = _parse_git_remote_url(upstream_url)
+        upstream_url = _get_remote_url(args.pull).decode('utf-8')
+        upstream_match = _parse_git_remote_url(upstream_url).decode('utf-8')
         upstream_remote_branch = '{}:master'.format(upstream_match.group('user'))
     else:
         upstream_remote_branch = 'master'

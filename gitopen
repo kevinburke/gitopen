@@ -108,7 +108,7 @@ if args.pull:
     branch = _get_branch()
     if args.pull != 'origin':
         upstream_url = _get_remote_url(args.pull).decode('utf-8')
-        upstream_match = _parse_git_remote_url(upstream_url).decode('utf-8')
+        upstream_match = _parse_git_remote_url(upstream_url)
         upstream_remote_branch = '{}:master'.format(upstream_match.group('user'))
     else:
         upstream_remote_branch = 'master'

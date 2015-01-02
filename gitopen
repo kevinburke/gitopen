@@ -117,6 +117,5 @@ if args.pull:
     else:
         _open_url(url + "/pull/new/{}...{}".format(upstream_remote_branch, branch))
 
-print url
 _open_url(url)
 

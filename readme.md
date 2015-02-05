@@ -67,11 +67,11 @@ $ gitopen --pulls
 
 ### Installation
 
-1. Clone this repository: `git clone git://github.com/kevinburke/gitopen.git`
-2. Place the `gitopen` executable somewhere on your PATH, possibly like this:
+Place the `gitopen` executable somewhere on your PATH, possibly like this:
 
 ```bash
-ln -s $PWD/gitopen /usr/local/bin
+curl -o /usr/local/bin/gitopen https://raw.githubusercontent.com/kevinburke/gitopen/master/gitopen
+chmod +x /usr/local/bin/gitopen
 ```
 
 ### Features

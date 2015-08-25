@@ -10,9 +10,11 @@ sentinel = object()
 
 parser = argparse.ArgumentParser(description="Get the git remote")
 parser.add_argument('remote_name', type=str, default='origin', nargs='?',
-                    help="Name of the remote to open")
+                    help="Name of the remote to open (defaults to origin)")
 parser.add_argument('-b', '--branch', nargs='?', const=sentinel,
                     help=('open the current branch in the browser'))
+parser.add_argument('-e', '--tree', default=None,
+                    help=('Open the tree at the specified folder/file'))
 parser.add_argument('-r', '--compare', action='store_true', 
                     help=('Open the compare view'))
 parser.add_argument('-s', '--pulls', action='store_true', 
@@ -95,10 +97,13 @@ if args.pulls and args.pull:
 
 if args.pulls:
     _open_url(url + "/pulls")
+elif args.tree is not None:
+    branch = _get_branch()
+    _open_url("{url}/tree/{branch}/{tree}".format(url=url, branch=branch, tree=args.tree))
 elif args.compare:
     _open_url(url + "/compare")
 elif args.branch and not args.tip:
-    _open_url(url + "/tree/{}".format(branch))
+    _open_url("{}/tree/{}".format(url, branch))
 elif args.issues:
     _open_url(url + "/issues")
 elif args.commits:

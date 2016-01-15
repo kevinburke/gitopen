@@ -25,6 +25,8 @@ parser.add_argument('-t', '--tip', action='store_true',
                     help=('Open the latest commit (works with --branch as well)'))
 parser.add_argument('-c', '--commits', action='store_true', 
                     help=('Open the commits list'))
+parser.add_argument('--commit', default=None,
+                    help=('Open a single commit'))
 parser.add_argument('-p', '--pull', nargs='?', default=None, const='origin',
                     help=('Open a pull request for the current branch. '
                           'Defaults to a pull request against the '
@@ -108,6 +110,8 @@ elif args.issues:
     _open_url(url + "/issues")
 elif args.commits:
     _open_url(url + "/commits")
+elif args.commit:
+    _open_url("{}/commit/{}".format(url, args.commit))
 elif args.tip:
     commit = subprocess.check_output(
         "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()

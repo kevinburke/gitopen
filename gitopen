@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import argparse
 import os
 import subprocess
@@ -49,13 +48,22 @@ def _get_branch():
     cmd = "git rev-parse --symbolic-full-name --abbrev-ref HEAD"
     return subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
 
+# match both github.com and github.com-blah (the latter is used as an SSH alias
+# if you have multiple hosts)
+def _get_host(rawhost):
+    match = re.search('(?P<host>.+?)-\S+$', rawhost)
+    if match:
+        return match.group('host')
+    return rawhost
+
 def main(args):
     remote_url = _get_remote_url(args.remote_name)
     match = _parse_git_remote_url(remote_url)
 
     if match is None:
         raise ValueError("Couldn't parse {url} as a git remote".format(url=remote_url))
-    url = "".join(["https://", match.group('host'), '/', match.group('user'), '/',
+    host = _get_host(match.group('host'))
+    url = "".join(["https://", host, '/', match.group('user'), '/',
                    match.group('repo_name')])
 
     if args.branch is None or (args.branch and args.branch is sentinel):

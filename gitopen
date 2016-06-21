@@ -33,9 +33,12 @@ def _parse_git_remote_url(url):
                            )
                            (?P<host>[^/:]+) # hostname
                            [:/]             # separator
-                           (?P<user>[^/]+)
-                           /
-                           (?P<repo_name>.+?)
+                           (
+                               (
+                                (?P<user>[^/]+)/
+                               )?
+                               (?P<repo_name>.+?)
+                           )
                            (\.git)?$
                            """, re.X)
     try:
@@ -57,14 +60,17 @@ def _get_host(rawhost):
     return rawhost
 
 def main(args):
-    remote_url = _get_remote_url(args.remote_name)
+    remote_url = _get_remote_url(args.remote_name).strip()
     match = _parse_git_remote_url(remote_url)
 
     if match is None:
         raise ValueError("Couldn't parse {url} as a git remote".format(url=remote_url))
     host = _get_host(match.group('host'))
-    url = "".join(["https://", host, '/', match.group('user'), '/',
-                   match.group('repo_name')])
+    if 'googlesource.com' in remote_url:
+        url = remote_url
+    else:
+        url = "".join(["https://", host, '/', match.group('user'), '/',
+                       match.group('repo_name')])
 
     if args.branch is None or (args.branch and args.branch is sentinel):
         branch = _get_branch()
@@ -93,7 +99,10 @@ def main(args):
     elif args.commits:
         _open_url(url + "/commits")
     elif args.commit:
-        _open_url("{}/commit/{}".format(url, args.commit))
+        if 'googlesource.com' in url:
+            _open_url("{}/+/{}".format(url, args.commit))
+        else:
+            _open_url("{}/commit/{}".format(url, args.commit))
     elif args.tip:
         commit = subprocess.check_output(
             "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()
@@ -140,5 +149,5 @@ if __name__ == '__main__':
                         help=('Open a pull request for the current branch. '
                               'Defaults to a pull request against the '
                               'remote_name remote.'))
-    args = parser.parse_args()
-    main(args)
+    main_args = parser.parse_args()
+    main(main_args)

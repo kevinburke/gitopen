@@ -118,6 +118,9 @@ def main(args):
             upstream_remote_branch = 'master'
         if 'github.com' in url:
             _open_url(url + "/compare/{branch}?expand=1".format(branch=branch))
+        elif 'bitbucket.org' in url:
+            # https://bitbucket.org/inconshreveable/ngrok/pull-requests/new?source=use-correct-css-class&t=1
+            _open_url("{}/pull-requests/new?source={}&t=1".format(url, branch))
         else:
             _open_url(url + "/pull/new/{}...{}".format(upstream_remote_branch, branch))
 

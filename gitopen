@@ -101,6 +101,8 @@ def main(args):
     elif args.commit:
         if 'googlesource.com' in url:
             _open_url("{}/+/{}".format(url, args.commit))
+        elif 'bitbucket.org' in url:
+            _open_url("{}/commits/{}".format(url, args.commit))
         else:
             _open_url("{}/commit/{}".format(url, args.commit))
     elif args.tip:

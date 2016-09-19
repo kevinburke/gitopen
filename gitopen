@@ -59,6 +59,19 @@ def _get_host(rawhost):
         return match.group('host')
     return rawhost
 
+def _open_commit(url, commit):
+    if 'googlesource.com' in url:
+        _open_url("{}/+/{}".format(url, commit))
+    elif 'bitbucket.org' in url:
+        _open_url("{}/commits/{}".format(url, commit))
+    else:
+        _open_url("{}/commit/{}".format(url, commit))
+
+def _open_url(url):
+    # Would like to use webbrowser but sometimes it just fails.
+    os.system("open '{url}'".format(url=url.strip()))
+    sys.exit(0)
+
 def main(args):
     remote_url = _get_remote_url(args.remote_name).strip()
     match = _parse_git_remote_url(remote_url)
@@ -77,11 +90,6 @@ def main(args):
     else:
         branch = args.branch
 
-    def _open_url(url):
-        # Would like to use webbrowser but sometimes it just fails.
-        os.system("open '{url}'".format(url=url.strip()))
-        sys.exit(0)
-
     if args.pulls and args.pull:
         raise ValueError("Cannot specify both --pulls and --pull flags")
 
@@ -99,16 +107,11 @@ def main(args):
     elif args.commits:
         _open_url(url + "/commits")
     elif args.commit:
-        if 'googlesource.com' in url:
-            _open_url("{}/+/{}".format(url, args.commit))
-        elif 'bitbucket.org' in url:
-            _open_url("{}/commits/{}".format(url, args.commit))
-        else:
-            _open_url("{}/commit/{}".format(url, args.commit))
+        _open_commit(url, args.commit)
     elif args.tip:
         commit = subprocess.check_output(
             "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()
-        _open_url(url + "/commit/{}".format(commit))
+        _open_commit(url, commit)
 
     if args.pull:
         branch = _get_branch()

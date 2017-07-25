@@ -94,7 +94,10 @@ def main(args):
         raise ValueError("Cannot specify both --pulls and --pull flags")
 
     if args.pulls:
-        _open_url(url + "/pulls")
+        if 'gitlab' in url:
+            _open_url(url + "/merge_requests")
+        else:
+            _open_url(url + "/pulls")
     elif args.tree is not None:
         # TODO get root & cwd and compute difference between them.
         _open_url("{url}/tree/{branch}/{tree}".format(url=url, branch=branch,

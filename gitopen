@@ -60,9 +60,9 @@ def _get_host(rawhost):
     return rawhost
 
 def _open_commit(url, commit):
-    if 'googlesource.com' in url:
+    if 'googlesource.com' in str(url):
         _open_url("{}/+/{}".format(url, commit))
-    elif 'bitbucket.org' in url:
+    elif 'bitbucket.org' in str(url):
         _open_url("{}/commits/{}".format(url, commit))
     else:
         _open_url("{}/commit/{}".format(url, commit))
@@ -79,7 +79,7 @@ def main(args):
     if match is None:
         raise ValueError("Couldn't parse {url} as a git remote".format(url=remote_url))
     host = _get_host(match.group('host'))
-    if 'googlesource.com' in remote_url:
+    if b'googlesource.com' in remote_url:
         url = remote_url
     else:
         url = "".join(["https://", host, '/', match.group('user'), '/',

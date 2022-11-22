@@ -92,6 +92,10 @@ def main(args):
 
     if args.pulls and args.pull:
         raise ValueError("Cannot specify both --pulls and --pull flags")
+    if args.pulls and args.pr is not None:
+        raise ValueError("Cannot specify both --pulls and --pr flags")
+    if args.pull and args.pr is not None:
+        raise ValueError("Cannot specify both --pull and --pr flags")
 
     if args.pulls:
         if 'gitlab' in url:
@@ -116,6 +120,12 @@ def main(args):
         commit = subprocess.check_output(
             "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()
         _open_commit(url, commit)
+
+    if args.pr is not None and args.pr < 0:
+        raise ValueError("Cannot specify a negative number for --pr")
+
+    if args.pr is not None and args.pr > 0:
+        _open_url(url + "/pull/" + str(args.pr))
 
     if args.pull:
         branch = _get_branch()
@@ -154,6 +164,8 @@ if __name__ == '__main__':
                         help=('Open the pull requests list'))
     parser.add_argument('-i', '--issues', action='store_true', 
                         help=('Open the issues page'))
+    parser.add_argument('-u', '--pr', type=int,
+                        help=('Open a pull request'))
     parser.add_argument('-t', '--tip', action='store_true', 
                         help=('Open the latest commit (works with --branch as well)'))
     parser.add_argument('-c', '--commits', action='store_true', 

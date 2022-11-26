@@ -108,6 +108,8 @@ def main(args):
                                                       tree=args.tree))
     elif args.compare:
         _open_url(url + "/compare")
+    elif args.actions:
+        _open_url(url + "/actions")
     elif args.branch and not args.tip:
         _open_url("{}/tree/{}".format(url, branch))
     elif args.issues:
@@ -156,6 +158,8 @@ if __name__ == '__main__':
                         help="Name of the remote to open (defaults to origin)")
     parser.add_argument('-b', '--branch', nargs='?', const=sentinel,
                         help=('open the current branch in the browser'))
+    parser.add_argument('-a', '--actions', nargs='?', const=sentinel,
+                        help=('Open the actions homepage in the browser'))
     parser.add_argument('-e', '--tree', default=None,
                         help=('Open the tree at the specified folder/file'))
     parser.add_argument('-r', '--compare', action='store_true', 

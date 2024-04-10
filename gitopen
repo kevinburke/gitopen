@@ -59,7 +59,11 @@ def _get_host(rawhost):
         return match.group('host')
     return rawhost
 
-def _open_commit(url, commit):
+def _open_commit(url: str, commit: str):
+    if not isinstance(url, str):
+        raise TypeError("Expected str, got {}".format(type(url).__name__))
+    if not isinstance(commit, str):
+        raise TypeError("Expected str, got {}".format(type(commit).__name__))
     if 'googlesource.com' in str(url):
         _open_url("{}/+/{}".format(url, commit))
     elif 'bitbucket.org' in str(url):
@@ -67,7 +71,7 @@ def _open_commit(url, commit):
     else:
         _open_url("{}/commit/{}".format(url, commit))
 
-def _open_url(url):
+def _open_url(url: str):
     # Would like to use webbrowser but sometimes it just fails.
     os.system("open '{url}'".format(url=url.strip()))
     sys.exit(0)
@@ -117,7 +121,7 @@ def main(args):
     elif args.commits:
         _open_url(url + "/commits")
     elif args.commit:
-        _open_commit(url, args.commit)
+        _open_commit(url.decode('utf-8'), args.commit)
     elif args.tip:
         commit = subprocess.check_output(
             "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()

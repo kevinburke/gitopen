@@ -54,7 +54,7 @@ def _get_branch():
 # match both github.com and github.com-blah (the latter is used as an SSH alias
 # if you have multiple hosts)
 def _get_host(rawhost):
-    match = re.search('(?P<host>.+?)-\S+$', rawhost)
+    match = re.search(r'(?P<host>.+?)-\S+$', rawhost)
     if match:
         return match.group('host')
     return rawhost
@@ -84,7 +84,7 @@ def main(args):
         raise ValueError("Couldn't parse {url} as a git remote".format(url=remote_url))
     host = _get_host(match.group('host'))
     if b'googlesource.com' in remote_url:
-        url = remote_url
+        url = remote_url.decode('utf-8')
     else:
         url = "".join(["https://", host, '/', match.group('user'), '/',
                        match.group('repo_name')])
@@ -121,7 +121,7 @@ def main(args):
     elif args.commits:
         _open_url(url + "/commits")
     elif args.commit:
-        _open_commit(url.decode('utf-8'), args.commit)
+        _open_commit(url, args.commit)
     elif args.tip:
         commit = subprocess.check_output(
             "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()

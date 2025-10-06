@@ -4,6 +4,50 @@ import os
 import subprocess
 import sys
 import re
+from pathlib import Path
+
+def _get_config_path():
+    """Get the config file path respecting XDG conventions"""
+    xdg_config_home = os.environ.get('XDG_CONFIG_HOME')
+    if xdg_config_home:
+        config_dir = Path(xdg_config_home)
+    else:
+        config_dir = Path.home() / '.config'
+
+    return config_dir / 'gitopen.conf'
+
+def _parse_config():
+    """Parse config file as simple key=value (TOML-compatible syntax)"""
+    config_path = _get_config_path()
+    config = {
+        'browser': 'Google Chrome',
+        'profile': None,
+    }
+
+    if not config_path.exists():
+        return config
+
+    try:
+        with open(config_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                # Skip empty lines and comments
+                if not line or line.startswith('#'):
+                    continue
+                # Simple key = value parser
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip().strip('"').strip("'")
+                    if key == 'browser':
+                        config['browser'] = value
+                    elif key == 'profile':
+                        config['profile'] = value
+    except Exception as e:
+        sys.stderr.write("Warning: Could not parse config file {}: {}\n".format(
+            config_path, e))
+
+    return config
 
 def _get_remote_url(remote_name):
     """ Retrieve the remote URL from a remote name like 'upstream' """
@@ -59,24 +103,48 @@ def _get_host(rawhost):
         return match.group('host')
     return rawhost
 
-def _open_commit(url: str, commit: str):
+def _open_commit(url: str, commit: str, config=None, profile_override=None):
     if not isinstance(url, str):
         raise TypeError("Expected str, got {}".format(type(url).__name__))
     if not isinstance(commit, str):
         raise TypeError("Expected str, got {}".format(type(commit).__name__))
     if 'googlesource.com' in str(url):
-        _open_url("{}/+/{}".format(url, commit))
+        _open_url("{}/+/{}".format(url, commit), config, profile_override)
     elif 'bitbucket.org' in str(url):
-        _open_url("{}/commits/{}".format(url, commit))
+        _open_url("{}/commits/{}".format(url, commit), config, profile_override)
     else:
-        _open_url("{}/commit/{}".format(url, commit))
+        _open_url("{}/commit/{}".format(url, commit), config, profile_override)
 
-def _open_url(url: str):
+def _open_url(url: str, config=None, profile_override=None):
     # Would like to use webbrowser but sometimes it just fails.
-    os.system("open '{url}'".format(url=url.strip()))
+    url = url.strip()
+
+    # Determine if we should use a specific browser with profile
+    if config is None:
+        config = _parse_config()
+
+    profile = profile_override if profile_override else config.get('profile')
+
+    if profile:
+        browser = config.get('browser', 'Google Chrome')
+        # Build the open command with Chrome profile
+        cmd = 'open -na "{browser}" --args --profile-directory="{profile}" --new-tab "{url}"'.format(
+            browser=browser,
+            profile=profile,
+            url=url
+        )
+        os.system(cmd)
+    else:
+        # Use default system browser
+        os.system("open '{url}'".format(url=url))
+
     sys.exit(0)
 
 def main(args):
+    # Load config once
+    config = _parse_config()
+    profile_override = getattr(args, 'profile', None)
+
     remote_url = _get_remote_url(args.remote_name).strip()
     match = _parse_git_remote_url(remote_url)
 
@@ -103,35 +171,35 @@ def main(args):
 
     if args.pulls:
         if 'gitlab' in url:
-            _open_url(url + "/merge_requests")
+            _open_url(url + "/merge_requests", config, profile_override)
         else:
-            _open_url(url + "/pulls")
+            _open_url(url + "/pulls", config, profile_override)
     elif args.tree is not None:
         # TODO get root & cwd and compute difference between them.
         _open_url("{url}/tree/{branch}/{tree}".format(url=url, branch=branch,
-                                                      tree=args.tree))
+                                                      tree=args.tree), config, profile_override)
     elif args.compare:
-        _open_url(url + "/compare")
+        _open_url(url + "/compare", config, profile_override)
     elif args.actions:
-        _open_url(url + "/actions")
+        _open_url(url + "/actions", config, profile_override)
     elif args.branch and not args.tip:
-        _open_url("{}/tree/{}".format(url, branch))
+        _open_url("{}/tree/{}".format(url, branch), config, profile_override)
     elif args.issues:
-        _open_url(url + "/issues")
+        _open_url(url + "/issues", config, profile_override)
     elif args.commits:
-        _open_url(url + "/commits")
+        _open_url(url + "/commits", config, profile_override)
     elif args.commit:
-        _open_commit(url, args.commit)
+        _open_commit(url, args.commit, config, profile_override)
     elif args.tip:
         commit = subprocess.check_output(
             "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()
-        _open_commit(url, commit)
+        _open_commit(url, commit, config, profile_override)
 
     if args.pr is not None and args.pr < 0:
         raise ValueError("Cannot specify a negative number for --pr")
 
     if args.pr is not None and args.pr > 0:
-        _open_url(url + "/pull/" + str(args.pr))
+        _open_url(url + "/pull/" + str(args.pr), config, profile_override)
 
     if args.pull:
         branch = _get_branch()
@@ -142,17 +210,17 @@ def main(args):
         else:
             upstream_remote_branch = 'master'
         if 'github.com' in url:
-            _open_url(url + "/compare/{branch}?expand=1".format(branch=branch))
+            _open_url(url + "/compare/{branch}?expand=1".format(branch=branch), config, profile_override)
         elif 'bitbucket.org' in url:
             # https://bitbucket.org/inconshreveable/ngrok/pull-requests/new?source=use-correct-css-class&t=1
-            _open_url("{}/pull-requests/new?source={}&t=1".format(url, branch))
+            _open_url("{}/pull-requests/new?source={}&t=1".format(url, branch), config, profile_override)
         elif 'gitlab' in url:
             # https://gitlab.com/software/app/merge_requests/new?merge_request[source_branch]=branch-name
-            _open_url("{}/merge_requests/new?merge_request[source_branch]={}".format(url, branch))
+            _open_url("{}/merge_requests/new?merge_request[source_branch]={}".format(url, branch), config, profile_override)
         else:
-            _open_url(url + "/pull/new/{}...{}".format(upstream_remote_branch, branch))
+            _open_url(url + "/pull/new/{}...{}".format(upstream_remote_branch, branch), config, profile_override)
 
-    _open_url(url)
+    _open_url(url, config, profile_override)
 
 if __name__ == '__main__':
     sentinel = object()
@@ -184,5 +252,8 @@ if __name__ == '__main__':
                         help=('Open a pull request for the current branch. '
                               'Defaults to a pull request against the '
                               'remote_name remote.'))
+    parser.add_argument('--profile', default=None,
+                        help=('Chrome/Chromium profile directory to use '
+                              '(e.g., "Profile 1"). Overrides config file.'))
     main_args = parser.parse_args()
     main(main_args)

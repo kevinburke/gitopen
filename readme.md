@@ -65,6 +65,33 @@ To open the view with all current pull requests for the repo, use the `-s` or
 $ gitopen --pulls
 ```
 
+### Configuration
+
+You can configure gitopen to open URLs in a specific Chrome/Chromium profile by
+creating a config file at `$XDG_CONFIG_HOME/gitopen.conf` (or
+`~/.config/gitopen.conf` if `XDG_CONFIG_HOME` is not set).
+
+Example config file:
+
+```toml
+# Browser to use (defaults to "Google Chrome")
+browser = "Google Chrome"
+
+# Chrome profile directory to use (e.g., "Profile 1", "Profile 2")
+# If not set, uses the system default browser
+profile = "Profile 1"
+```
+
+You can also override the profile on the command line:
+
+```bash
+gitopen --profile "Profile 2"
+```
+
+To find your Chrome profile directory names, open `chrome://version` in Chrome
+and look at the "Profile Path". The profile directory name is the last component
+(e.g., "Default", "Profile 1", "Profile 2").
+
 ### Installation
 
 1. Clone this repository: `git clone git://github.com/kevinburke/gitopen.git`

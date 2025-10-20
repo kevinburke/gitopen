@@ -63,7 +63,7 @@ def _get_remote_url(remote_name):
 
 def _parse_git_remote_url(url):
     """Parse Git remote URL's into a SRE_Match object
-    
+
     Matches user@<hostname>:<web_user>/<user_repo>
     or      git://<hostname>/<web_user>/<user_repo>
     """
@@ -85,10 +85,7 @@ def _parse_git_remote_url(url):
                            )
                            (\.git)?$
                            """, re.X)
-    try:
-        return ssh_regex.match(str(url, 'utf-8'))
-    except Exception: # Python 2
-        return ssh_regex.match(str(url))
+    return ssh_regex.match(url)
 
 
 def _get_branch():
@@ -104,9 +101,9 @@ def _get_host(rawhost):
     return rawhost
 
 def _open_commit(url: str, commit: str, config=None, profile_override=None):
-    if 'googlesource.com' in str(url):
+    if 'googlesource.com' in url:
         _open_url("{}/+/{}".format(url, commit), config, profile_override)
-    elif 'bitbucket.org' in str(url):
+    elif 'bitbucket.org' in url:
         _open_url("{}/commits/{}".format(url, commit), config, profile_override)
     else:
         _open_url("{}/commit/{}".format(url, commit), config, profile_override)
@@ -141,14 +138,14 @@ def main(args):
     config = _parse_config()
     profile_override = getattr(args, 'profile', None)
 
-    remote_url = _get_remote_url(args.remote_name).strip()
+    remote_url = _get_remote_url(args.remote_name).strip().decode('utf-8')
     match = _parse_git_remote_url(remote_url)
 
     if match is None:
         raise ValueError("Couldn't parse {url} as a git remote".format(url=remote_url))
     host = _get_host(match.group('host'))
-    if b'googlesource.com' in remote_url:
-        url = remote_url.decode('utf-8')
+    if 'googlesource.com' in remote_url:
+        url = remote_url
     else:
         url = "".join(["https://", host, '/', match.group('user'), '/',
                        match.group('repo_name')])
@@ -188,7 +185,7 @@ def main(args):
         _open_commit(url, args.commit, config, profile_override)
     elif args.tip:
         commit = subprocess.check_output(
-            "git rev-parse {}".format(branch or "HEAD"), shell=True).strip()
+            "git rev-parse {}".format(branch or "HEAD"), shell=True).strip().decode('utf-8')
         _open_commit(url, commit, config, profile_override)
 
     if args.pr is not None and args.pr < 0:

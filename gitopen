@@ -92,6 +92,18 @@ def _get_branch():
     cmd = "git rev-parse --symbolic-full-name --abbrev-ref HEAD"
     return subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
 
+def _get_default_branch(remote_name):
+    """Get the default branch for a remote (e.g., 'main' or 'master')"""
+    try:
+        # Get the symbolic ref for the remote's HEAD
+        cmd = "git symbolic-ref refs/remotes/{}/HEAD".format(remote_name)
+        result = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
+        # Result is like 'refs/remotes/origin/main', extract just the branch name
+        return result.split('/')[-1]
+    except subprocess.CalledProcessError:
+        # If symbolic-ref fails, fall back to 'master'
+        return 'master'
+
 # match both github.com and github.com-blah (the latter is used as an SSH alias
 # if you have multiple hosts)
 def _get_host(rawhost):
@@ -196,16 +208,15 @@ def main(args):
 
     if args.pull:
         branch = _get_branch()
+        default_branch = _get_default_branch(args.pull)
         if args.pull != 'origin':
             upstream_url = _get_remote_url(args.pull).decode('utf-8')
             upstream_match = _parse_git_remote_url(upstream_url)
-            upstream_remote_branch = '{}:master'.format(upstream_match.group('user'))
+            upstream_remote_branch = '{}:{}'.format(upstream_match.group('user'), default_branch)
         else:
-            upstream_remote_branch = 'master'
+            upstream_remote_branch = default_branch
         if 'github.com' in url:
-            # Note: quick_pull doesn't work - see https://github.com/github/docs/issues/40946
-            # Would prefer: /compare/{}...{}?quick_pull=1 but it doesn't work
-            _open_url(url + "/pull/new/{}".format(branch), config, profile_override)
+            _open_url(url + "/compare/{}...{}?quick_pull=1".format(upstream_remote_branch, branch), config, profile_override)
         elif 'bitbucket.org' in url:
             # https://bitbucket.org/inconshreveable/ngrok/pull-requests/new?source=use-correct-css-class&t=1
             _open_url("{}/pull-requests/new?source={}&t=1".format(url, branch), config, profile_override)

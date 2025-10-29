@@ -106,6 +106,30 @@ ln -s $PWD/gitopen /usr/local/bin
 * Works with URL's behind the firewall (eg private installs)
 * Works with SSH and git-read-only URL's
 
+### Development
+
+To run tests and type checking:
+
+1. Install dependencies into a virtual environment:
+```bash
+make install
+```
+
+2. Run tests (includes type checking):
+```bash
+make test
+```
+
+3. Run type checking only:
+```bash
+make typecheck
+```
+
+4. Clean up the virtual environment:
+```bash
+make clean
+```
+
 ## Todo
 
 - open pull requests against the upstream by default (if it exists)

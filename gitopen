@@ -106,9 +106,9 @@ def _get_default_branch(remote_name):
 
 # match both github.com and github.com-blah (the latter is used as an SSH alias
 # if you have multiple hosts)
-def _get_host(rawhost):
+def _get_host(rawhost: str) -> str:
     match = re.search(r'(?P<host>.+?)-\S+$', rawhost)
-    if match:
+    if match is not None:
         return match.group('host')
     return rawhost
 
@@ -212,6 +212,8 @@ def main(args):
         if args.pull != 'origin':
             upstream_url = _get_remote_url(args.pull).decode('utf-8')
             upstream_match = _parse_git_remote_url(upstream_url)
+            if upstream_match is None:
+                raise ValueError("Couldn't parse {url} as a git remote".format(url=upstream_url))
             upstream_remote_branch = '{}:{}'.format(upstream_match.group('user'), default_branch)
         else:
             upstream_remote_branch = default_branch
